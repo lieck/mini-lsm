@@ -102,3 +102,10 @@
     clippy::wildcard_enum_match_arm,
 )]
 
+#[allow(
+    clippy::panic, // allow debug_assert, panic in production code
+    clippy::multiple_crate_versions, // caused by the dependency, can't be fixed
+)]
+
+/// block
+pub mod block;

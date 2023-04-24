@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 clippy-utilities = "0.1.0"
+anyhow = "1"
+bytes = "1"
