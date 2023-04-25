@@ -58,7 +58,7 @@ impl BlockIterator {
 
     /// Returns true if the iterator is valid.
     pub fn is_valid(&self) -> bool {
-        self.idx >= self.block.offsets.len()
+        self.idx < self.block.offsets.len()
     }
 
     /// Seeks to the first key in the block.
@@ -92,8 +92,9 @@ impl BlockIterator {
 
     /// Move to the next key in the block.
     pub fn next(&mut self) {
-        if self.idx + 1 < self.block.offsets.len() {
-            self.set_entry_idx(self.idx + 1);
+        self.idx += 1;
+        if self.idx < self.block.offsets.len() {
+            self.set_entry_idx(self.idx);
         }
     }
 

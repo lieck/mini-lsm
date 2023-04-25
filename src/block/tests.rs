@@ -84,6 +84,41 @@ fn test_block_decode() {
     assert_eq!(block.data, decoded_block.data);
 }
 
+
+
+#[test]
+fn test_block_multiple_keys() {
+    let mut builder = BlockBuilder::new(300);
+    for idx in 0..11 {
+        let key = key_of(idx);
+        let value = value_of(idx);
+        assert!(builder.add(&key[..], &value[..]));
+    }
+    let block = builder.build();
+    let block = Arc::new(block);
+    let mut iter = BlockIterator::create_and_seek_to_first(block);
+    for i in 0..11 {
+        let key = iter.key();
+        let value = iter.value();
+        assert_eq!(
+            key,
+            key_of(i),
+            "expected key: {:?}, actual key: {:?}",
+            as_bytes(&key_of(i)),
+            as_bytes(key)
+        );
+        assert_eq!(
+            value,
+            value_of(i),
+            "expected value: {:?}, actual value: {:?}",
+            as_bytes(&value_of(i)),
+            as_bytes(value)
+        );
+        iter.next();
+    }
+}
+
+
 #[test]
 fn test_block_iterator() {
     let block = Arc::new(generate_block_size(100));

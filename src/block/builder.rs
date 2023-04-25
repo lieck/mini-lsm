@@ -43,6 +43,11 @@ impl BlockBuilder {
         true
     }
 
+    /// Get the estimated size of the block.
+    pub fn estimated_size(&self) -> usize {
+        self.curr_size
+    }
+
     ///
     pub fn build(self) -> Block {
         Block {
