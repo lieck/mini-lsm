@@ -1,5 +1,8 @@
 
 ///
+pub mod merge_iterator;
+
+///
 pub trait StorageIterator {
     /// Get the current value.
     fn value(&self) -> &[u8];
@@ -13,3 +16,7 @@ pub trait StorageIterator {
     /// Move to the next position.
     fn next(&mut self) -> anyhow::Result<()>;
 }
+
+
+#[cfg(test)]
+mod tests;
