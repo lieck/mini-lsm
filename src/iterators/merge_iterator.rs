@@ -21,7 +21,8 @@ impl<I: StorageIterator> PartialOrd for HeapWrapper<I> {
             cmp::Ordering::Equal => self.0.partial_cmp(&other.0),
             cmp::Ordering::Less => Some(cmp::Ordering::Less),
             cmp::Ordering::Greater => Some(cmp::Ordering::Greater),
-        }.map(|x| x.reverse())
+        }
+        .map(|x| x.reverse())
     }
 }
 
@@ -54,21 +55,21 @@ impl<I: StorageIterator> MergeIterator<I> {
         if iters.iter().all(|x| !x.is_valid()) {
             let mut iters = iters;
             return Self {
-                iters : heap,
+                iters: heap,
                 current: Some(HeapWrapper(0, iters.pop().unwrap())),
-            }
+            };
         }
 
         for (idx, iter) in iters.into_iter().enumerate() {
             if iter.is_valid() {
                 heap.push(HeapWrapper(idx, iter));
             }
-        } 
-        
+        }
+
         let current = heap.pop();
         Self {
-            iters : heap,
-            current
+            iters: heap,
+            current,
         }
     }
 }
@@ -107,7 +108,7 @@ impl<I: StorageIterator> StorageIterator for MergeIterator<I> {
         }
 
         self.current = self.iters.pop();
-    
+
         Ok(())
     }
 }

@@ -1,12 +1,11 @@
-use std::{sync::Arc, path::Path, fs};
+use std::{fs, path::Path, sync::Arc};
 
 use bytes::Bytes;
 use rand::Rng;
 
-use crate::sstable::{iterator::SSTableIterator, builder::SSTableBuilder};
+use crate::sstable::{builder::SSTableBuilder, iterator::SSTableIterator};
 
 use super::{merge_iterator::MergeIterator, StorageIterator};
-
 
 fn key_of(val: usize) -> Vec<u8> {
     format!("key_{:05}", val).into_bytes()
@@ -38,9 +37,10 @@ fn assert_kv(i: usize, key: &[u8], value: &[u8]) {
     );
 }
 
-
-fn generate_sstable_test<T, K> (size : usize, map : T, reduce : K)
-where T : Fn(&mut Vec<SSTableBuilder>), K : Fn(Vec<Box<SSTableIterator>>)
+fn generate_sstable_test<T, K>(size: usize, map: T, reduce: K)
+where
+    T: Fn(&mut Vec<SSTableBuilder>),
+    K: Fn(Vec<Box<SSTableIterator>>),
 {
     let mut builder = Vec::new();
     for _ in 0..size {
@@ -48,9 +48,9 @@ where T : Fn(&mut Vec<SSTableBuilder>), K : Fn(Vec<Box<SSTableIterator>>)
     }
 
     map(&mut builder);
-    
+
     let mut rng = rand::thread_rng();
-    let ran_num : u32 = rng.gen();
+    let ran_num: u32 = rng.gen();
 
     let mut paths = Vec::new();
     for i in 0..size {
@@ -60,16 +60,18 @@ where T : Fn(&mut Vec<SSTableBuilder>), K : Fn(Vec<Box<SSTableIterator>>)
 
     let mut ssts = vec![];
     for (idx, sst) in builder.into_iter().enumerate() {
-        ssts.push(Arc::new(sst.build(idx, None, Path::new(&paths[idx])).unwrap()));
+        ssts.push(Arc::new(
+            sst.build(idx, None, Path::new(&paths[idx])).unwrap(),
+        ));
     }
 
     let mut iters = vec![];
     for sst in ssts {
-        iters.push(Box::new(SSTableIterator::create_and_seek_to_first(
-            sst
-        ).unwrap()));
+        iters.push(Box::new(
+            SSTableIterator::create_and_seek_to_first(sst).unwrap(),
+        ));
     }
-    
+
     reduce(iters);
 
     for path in paths {
@@ -79,7 +81,7 @@ where T : Fn(&mut Vec<SSTableBuilder>), K : Fn(Vec<Box<SSTableIterator>>)
 
 #[test]
 fn test_merge_iterator_non_overlap() {
-    let map = |sst : &mut Vec<SSTableBuilder>| {
+    let map = |sst: &mut Vec<SSTableBuilder>| {
         for i in 0..100 {
             let key = key_of(i);
             let value = value_of(i);
@@ -91,7 +93,7 @@ fn test_merge_iterator_non_overlap() {
         }
     };
 
-    let reduce = |iters : Vec<Box<SSTableIterator>>| {
+    let reduce = |iters: Vec<Box<SSTableIterator>>| {
         let mut iter = MergeIterator::create(iters);
         for i in 0..100 {
             assert!(iter.is_valid(), "{i}");
@@ -105,10 +107,9 @@ fn test_merge_iterator_non_overlap() {
     generate_sstable_test(2, map, reduce);
 }
 
-
 #[test]
 fn test_merge_iterator_overlap() {
-    let map = |sst : &mut Vec<SSTableBuilder>| {
+    let map = |sst: &mut Vec<SSTableBuilder>| {
         for idx in 0..3 {
             for i in 0..100 {
                 let key = key_of(i);
@@ -118,8 +119,7 @@ fn test_merge_iterator_overlap() {
         }
     };
 
-    let reduce = |iters : Vec<Box<SSTableIterator>>| {
-
+    let reduce = |iters: Vec<Box<SSTableIterator>>| {
         let mut iter = MergeIterator::create(iters);
         for i in 0..100 {
             assert!(iter.is_valid(), "{i}");
@@ -141,7 +141,7 @@ fn test_merge_iterator_overlap() {
                 as_bytes(&value_of(0)),
                 as_bytes(value)
             );
-        
+
             iter.next().unwrap();
         }
     };
@@ -149,10 +149,9 @@ fn test_merge_iterator_overlap() {
     generate_sstable_test(3, map, reduce);
 }
 
-
 #[test]
 fn test_merge_iterator_test1() {
-    let map = |sst : &mut Vec<SSTableBuilder>| {
+    let map = |sst: &mut Vec<SSTableBuilder>| {
         for i in 0..100 {
             let key = key_of(i);
             if i & 1 == 0 {
@@ -164,8 +163,7 @@ fn test_merge_iterator_test1() {
         }
     };
 
-    let reduce = |iters : Vec<Box<SSTableIterator>>| {
-
+    let reduce = |iters: Vec<Box<SSTableIterator>>| {
         let mut iter = MergeIterator::create(iters);
         for i in 0..100 {
             assert!(iter.is_valid(), "{i}");
@@ -197,11 +195,10 @@ fn test_merge_iterator_test1() {
                     as_bytes(value)
                 );
             }
-        
+
             iter.next().unwrap();
         }
     };
 
     generate_sstable_test(3, map, reduce);
 }
-

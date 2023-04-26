@@ -4,7 +4,7 @@ use crate::block::iterator::BlockIterator;
 use crate::iterators::StorageIterator;
 
 use super::SSTable;
-use anyhow::{Result, Ok};
+use anyhow::{Ok, Result};
 
 ///
 #[derive(Debug)]
@@ -56,9 +56,7 @@ impl SSTableIterator {
     }
 }
 
-
 impl StorageIterator for SSTableIterator {
-
     fn key(&self) -> &[u8] {
         self.block_iterator.key()
     }

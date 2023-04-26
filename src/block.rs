@@ -1,7 +1,6 @@
 use bytes::BufMut;
 use bytes::{Buf, Bytes};
 
-
 ///
 pub mod builder;
 
@@ -63,10 +62,9 @@ impl Block {
         }
     }
 
-
     ///
     #[cfg(test)]
-    pub fn dbeug_print(block : std::sync::Arc<Block>) {
+    pub fn dbeug_print(block: std::sync::Arc<Block>) {
         use self::iterator::BlockIterator;
 
         let mut iter = BlockIterator::create_and_seek_to_first(block);

@@ -1,9 +1,8 @@
-
 use bytes::Bytes;
 use std::sync::Arc;
 
-use super::{builder::BlockBuilder, Block};
 use super::iterator::BlockIterator;
+use super::{builder::BlockBuilder, Block};
 
 #[test]
 fn test_block_build_single_key() {
@@ -24,11 +23,11 @@ fn test_block_build_single_key() {
     }
 }
 
-fn key_of(val : usize) -> Vec<u8> {
+fn key_of(val: usize) -> Vec<u8> {
     format!("key_{:03}", val).into_bytes()
 }
 
-fn value_of(val : usize) -> Vec<u8> {
+fn value_of(val: usize) -> Vec<u8> {
     format!("val_{:010}", val).into_bytes()
 }
 
@@ -36,7 +35,7 @@ fn as_bytes(x: &[u8]) -> Bytes {
     Bytes::copy_from_slice(x)
 }
 
-fn generate_block_size(idx : usize) -> Block {
+fn generate_block_size(idx: usize) -> Block {
     let mut builder = BlockBuilder::new(10000);
     for idx in 0..idx {
         let key = key_of(idx);
@@ -84,8 +83,6 @@ fn test_block_decode() {
     assert_eq!(block.data, decoded_block.data);
 }
 
-
-
 #[test]
 fn test_block_multiple_keys() {
     let mut builder = BlockBuilder::new(300);
@@ -117,7 +114,6 @@ fn test_block_multiple_keys() {
         iter.next();
     }
 }
-
 
 #[test]
 fn test_block_iterator() {

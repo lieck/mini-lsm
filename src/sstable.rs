@@ -1,6 +1,13 @@
 use anyhow::{Ok, Result};
 use bytes::{Buf, BufMut, Bytes};
-use std::{fmt::Debug, fs::{File, OpenOptions}, io::Write, os::unix::prelude::FileExt, path::Path, sync::Arc};
+use std::{
+    fmt::Debug,
+    fs::{File, OpenOptions},
+    io::Write,
+    os::unix::prelude::FileExt,
+    path::Path,
+    sync::Arc,
+};
 
 use crate::{block::Block, lsm_storage::BlockCache};
 
@@ -59,7 +66,11 @@ impl FileObject {
     /// Create a new file object and write the file to the disk.
     pub fn create(path: &Path, data: Vec<u8>) -> Result<Self> {
         assert_ne!(data.len(), 0);
-        let mut file = OpenOptions::new().create(true).read(true).write(true).open(path)?;
+        let mut file = OpenOptions::new()
+            .create(true)
+            .read(true)
+            .write(true)
+            .open(path)?;
         file.write_all(&data)?;
         Ok(FileObject(file, data.len() as u64))
     }

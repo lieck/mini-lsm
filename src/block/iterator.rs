@@ -1,25 +1,22 @@
-
-
-use std::sync::Arc;
 use bytes::Buf;
+use std::sync::Arc;
 
 use super::Block;
-
 
 /// Block Iterator
 #[derive(Debug)]
 pub struct BlockIterator {
     /// block
-    block : Arc<Block>,
+    block: Arc<Block>,
 
     /// key
-    key : Vec<u8>,
+    key: Vec<u8>,
 
     /// value
-    value : Vec<u8>,
+    value: Vec<u8>,
 
     /// idx
-    idx : usize,
+    idx: usize,
 }
 
 impl BlockIterator {
@@ -63,11 +60,11 @@ impl BlockIterator {
 
     /// Seeks to the first key in the block.
     pub fn seek_to_first(&mut self) {
-        if self.block.offsets.len() >= 1 {
+        if !self.block.offsets.is_empty() {
             self.set_entry_idx(0);
         }
     }
-    
+
     /// Seek to the first key that >= `key`.
     pub fn seek_to_key(&mut self, key: &[u8]) {
         let mut l = 0;
@@ -98,7 +95,7 @@ impl BlockIterator {
         }
     }
 
-    fn set_entry_idx(&mut self, idx : usize) {
+    fn set_entry_idx(&mut self, idx: usize) {
         let mut offset = self.block.offsets[idx] as usize;
 
         let len = (&self.block.data[offset..offset + 2]).get_u16() as usize;
@@ -106,12 +103,11 @@ impl BlockIterator {
         self.key = self.block.data[offset..offset + len].to_vec();
 
         offset += len;
-        
+
         let len = (&self.block.data[offset..offset + 2]).get_u16() as usize;
         offset += 2;
         self.value = self.block.data[offset..offset + len].to_vec();
 
         self.idx = idx;
     }
-
 }

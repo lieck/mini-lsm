@@ -48,11 +48,11 @@ impl SSTableBuilder {
         let file = FileObject::create(path.as_ref(), self.data)?;
 
         Ok(SSTable {
-            sst_id : id,
+            sst_id: id,
             file,
             block_cache,
-            block_meta_offset : block_meta_offset as usize,
-            block_metas : self.meta
+            block_meta_offset: block_meta_offset as usize,
+            block_metas: self.meta,
         })
     }
 
@@ -62,16 +62,16 @@ impl SSTableBuilder {
             let block =
                 std::mem::replace(&mut self.curr_block, BlockBuilder::new(self.max_block_size));
             let block = block.build().encode();
-            
+
             if block.len() > 2 {
                 self.data.extend(block);
             }
-        
+
             self.meta.push(BlockMeta {
                 offset: self.data.len(),
                 first_key: key.to_vec().into(),
             });
-            
+
             if !self.curr_block.add(key, value) {
                 panic!("key + val >= max_block_size");
             }
